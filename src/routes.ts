@@ -1,10 +1,8 @@
 import { createCheerioRouter, RequestQueue } from "crawlee";
-
-interface ProductData {
-  [key: string]: string;
-}
+import { ProductData, Product } from "./interfaces.js";
 
 export const router = createCheerioRouter();
+export const all_products: Product[] = [];
 const base_url = ["https://www.vinci-play.com"];
 
 router.addDefaultHandler(async ({ $, addRequests, log }) => {
@@ -14,7 +12,7 @@ router.addDefaultHandler(async ({ $, addRequests, log }) => {
     const img_src = $element.find("img").attr("src");
     const href = $element.attr("href");
     if (!href) {
-      log.info("no href found - skipping...");
+      log.info("no href found - skipping..." + element);
       return;
     }
 
@@ -43,9 +41,15 @@ router.addHandler("product", async ({ request, $, log, pushData }) => {
   });
   log.info(`${title}`, { url: request.loadedUrl });
 
-  await pushData({
-    url: request.loadedUrl,
+  all_products.push({
     title,
+    url: request.loadedUrl,
+    img_src: request.userData.img_src,
+    product_data,
+  });
+  await pushData({
+    title,
+    url: request.loadedUrl,
     img_src: request.userData.img_src,
     product_data,
   });
