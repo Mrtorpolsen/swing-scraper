@@ -21,9 +21,12 @@ export async function exportToExcel(
       title: product.title,
       url: product.url,
       img_src: product.img_src,
-      product_data: JSON.stringify(product.product_data),
+      product_data: JSON.stringify(product.product_data)
+        .replace(/},{/g, " ")
+        .replace(/[\[\]{"}]/g, ""),
     });
   });
+
   worksheet.getRow(1).font = { bold: true, color: { argb: "FF0000FF" } };
   worksheet.getRow(1).alignment = { horizontal: "center" };
 
