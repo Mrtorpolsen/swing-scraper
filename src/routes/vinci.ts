@@ -1,5 +1,5 @@
-import { createCheerioRouter, RequestQueue } from "crawlee";
-import { ProductData, Product } from "./interfaces/vinci.js";
+import { createCheerioRouter } from "crawlee";
+import { ProductData, Product } from "../interfaces/vinci.js";
 
 export const router = createCheerioRouter();
 export const all_products: Product[] = [];
@@ -32,8 +32,14 @@ router.addDefaultHandler(async ({ $, addRequests, log }) => {
 router.addHandler("product", async ({ request, $, log, pushData }) => {
   const title = $(".product-title").first().text();
   const product_data: ProductData[] = [];
+  const product_table = $(".product-table");
 
-  $(".product-table tr").each((_, element) => {
+  if (product_table.length === 0) {
+    log.warning(`No product table found for ${request.loadedUrl}`);
+    return;
+  }
+
+  product_table.find("tr").each((_, element) => {
     const data_name = $(element).find(".align-left").text().trim();
     const data_value = $(element).find(".align-right").text().trim();
 
@@ -41,16 +47,13 @@ router.addHandler("product", async ({ request, $, log, pushData }) => {
   });
   log.info(`${title}`, { url: request.loadedUrl });
 
-  all_products.push({
+  const current_product = {
     title,
     url: request.loadedUrl,
     img_src: request.userData.img_src,
     product_data,
-  });
-  await pushData({
-    title,
-    url: request.loadedUrl,
-    img_src: request.userData.img_src,
-    product_data,
-  });
+  };
+
+  all_products.push(current_product);
+  await pushData(current_product);
 });
