@@ -1,5 +1,5 @@
 import ExcelJS from "exceljs";
-import { ProductData, Product } from "./interfaces.js";
+import { ProductData, Product } from "../interfaces/vinci.js";
 
 export async function exportToExcel(
   data: Product[],

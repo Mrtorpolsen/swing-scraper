@@ -1,7 +1,7 @@
 // For more information, see https://crawlee.dev/
 import { CheerioCrawler, ProxyConfiguration } from "crawlee";
-import { exportToExcel } from "./exportToExcel.js";
-import extractSubdomain from "./extractSubdomain.js";
+import { exportToExcel } from "./utils/exportToExcel.js";
+import extractSubdomain from "./utils/extractSubdomain.js";
 
 import { router, all_products } from "./routes.js";
 
@@ -11,7 +11,7 @@ const crawler = new CheerioCrawler({
   // proxyConfiguration: new ProxyConfiguration({ proxyUrls: ['...'] }),
   requestHandler: router,
   // Comment this option to scrape the full website.
-  maxRequestsPerCrawl: 5,
+  maxRequestsPerCrawl: 1000,
 });
 
 await crawler.run(startUrls);
