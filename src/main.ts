@@ -6,7 +6,7 @@ import extractSubdomain from "./utils/extractSubdomain.js";
 /* import { router, all_products } from "./routes/vinci.js";
 const startUrls = ["https://www.vinci-play.com/en/playground-equipment"]; */
 
-import { router, all_products } from "./routes/kompagn.js";
+import { router, all_products } from "./routes/kompan.js";
 const startUrls = [
   "https://www.kompan.com/da/dk/produkter?view_as=List&page=250",
 ];

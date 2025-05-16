@@ -1,5 +1,5 @@
 import { createCheerioRouter } from "crawlee";
-import { ProductData, Product } from "../interfaces/vinci.js";
+import { ProductData, Product } from "../interfaces/product.js";
 
 export const router = createCheerioRouter();
 export const all_products: Product[] = [];
