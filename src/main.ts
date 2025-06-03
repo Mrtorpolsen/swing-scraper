@@ -1,28 +1,42 @@
 // For more information, see https://crawlee.dev/
-import { CheerioCrawler, ProxyConfiguration } from "crawlee";
+import { CheerioCrawler, RequestQueue } from "crawlee";
 import { exportToExcel } from "./utils/exportToExcel.js";
-import extractSubdomain from "./utils/extractSubdomain.js";
+import { Product } from "./interfaces/product.js";
 
-/* import { router, all_products } from "./routes/vinci.js";
-const startUrls = ["https://www.vinci-play.com/en/playground-equipment"]; */
+import {
+  startUrl as vinciStartUrl,
+  router as vinciRouter,
+  products as vinciProducts,
+} from "./routes/vinci.js";
+import {
+  startUrl as kompanURL,
+  router as kompanRouter,
+  products as kompanProducts,
+} from "./routes/kompan.js";
+async function runCrawler(startUrl: string[], router: any) {
+  const requestQueue = await RequestQueue.open(`queue - ${startUrl[0]}`);
 
-import { router, all_products } from "./routes/kompan.js";
-const startUrls = [
-  "https://www.kompan.com/da/dk/produkter?view_as=List&page=250",
-];
+  for (const url of startUrl) {
+    await requestQueue.addRequest({ url });
+  }
 
-const crawler = new CheerioCrawler({
-  // proxyConfiguration: new ProxyConfiguration({ proxyUrls: ['...'] }),
-  requestHandler: router,
-  // Comment this option to scrape the full website.
-  maxRequestsPerCrawl: 5,
-});
+  const crawler = new CheerioCrawler({
+    requestHandler: router,
+    requestQueue,
+    maxRequestsPerCrawl: 20,
+  });
 
-await crawler.run(startUrls);
+  await crawler.run();
+}
 
-/* exportToExcel(
+await runCrawler(vinciStartUrl, vinciRouter);
+await runCrawler(kompanURL, kompanRouter);
+
+const all_products: Product[] = [...kompanProducts, ...vinciProducts];
+
+exportToExcel(
   all_products,
   "./storage/datasets/excel/" +
     new Date().toISOString().replace(/[^a-zA-Z0-9]/g, ""),
-  extractSubdomain(startUrls[0])
-); */
+  "Combined Products"
+);

@@ -1,12 +1,13 @@
 import { createCheerioRouter } from "crawlee";
 import { ProductData, Product } from "../interfaces/product.js";
 
+export const startUrl = [
+  "https://www.kompan.com/da/dk/produkter?view_as=List&page=250",
+];
 export const router = createCheerioRouter();
-export const all_products: Product[] = [];
+export const products: Product[] = [];
 
-router.addDefaultHandler(async ({ enqueueLinks, log }) => {
-  log.info(`enqueueing new URLs`);
-
+router.addDefaultHandler(async ({ enqueueLinks }) => {
   await enqueueLinks({
     globs: ["https://www.kompan.com/da/dk/p/**"],
     label: "product",
@@ -17,9 +18,9 @@ router.addHandler("product", async ({ request, $, log, pushData }) => {
   const title_element = $("h1").first();
   const title = title_element.text();
   const product_id = title_element.prevAll("p").first().text().trim();
-  const img_src = $(`img[alt="${title}"]`).attr("src");
+  const img_src =
+    $(`img[alt="${title}"]`).attr("src") || "Image source not found";
   log.info(`${title} - ${product_id}`, { url: request.loadedUrl });
-  console.log(img_src);
 
   const product_data: ProductData[] = [];
 
@@ -43,18 +44,20 @@ router.addHandler("product", async ({ request, $, log, pushData }) => {
     });
   });
 
-  /*   const current_product = {
-    title,
+  const current_product = {
+    company: "Kompan",
+    title: `${title} - ${product_id}`,
     url: request.loadedUrl,
-    img_src: request.userData.img_src,
+    img_src: img_src,
     product_data,
   };
 
-  all_products.push(current_product); */
+  products.push(current_product);
   await pushData({
+    company: "Kompan",
     title: `${title} - ${product_id}`,
     url: request.loadedUrl,
-    img_src: request.userData.img_src,
+    img_src: img_src,
     product_data,
   });
 });

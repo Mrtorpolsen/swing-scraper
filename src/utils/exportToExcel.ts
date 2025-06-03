@@ -10,6 +10,7 @@ export async function exportToExcel(
   const worksheet = workbook.addWorksheet(source);
 
   worksheet.columns = [
+    { header: "Company", key: "company", width: 30 },
     { header: "Title", key: "title", width: 30 },
     { header: "URL", key: "url", width: 30 },
     { header: "Image", key: "img_src", width: 30 },
@@ -18,6 +19,7 @@ export async function exportToExcel(
 
   data.forEach((product) => {
     worksheet.addRow({
+      company: product.company,
       title: product.title,
       url: product.url,
       img_src: product.img_src,
