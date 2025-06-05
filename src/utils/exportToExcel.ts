@@ -1,5 +1,5 @@
 import ExcelJS from "exceljs";
-import { ProductData, Product } from "../interfaces/product.js";
+import { Product } from "../interfaces/product.js";
 
 export async function exportToExcel(
   data: Product[],
@@ -13,8 +13,8 @@ export async function exportToExcel(
     { header: "Company", key: "company", width: 30 },
     { header: "Title", key: "title", width: 30 },
     { header: "URL", key: "url", width: 30 },
-    { header: "Image", key: "img_src", width: 30 },
-    { header: "Product Data", key: "product_data", width: 100 },
+    { header: "Image", key: "imgSrc", width: 30 },
+    { header: "Product Data", key: "productData", width: 100 },
   ];
 
   data.forEach((product) => {
@@ -22,8 +22,8 @@ export async function exportToExcel(
       company: product.company,
       title: product.title,
       url: product.url,
-      img_src: product.img_src,
-      product_data: JSON.stringify(product.product_data)
+      imgSrc: product.imgSrc,
+      productData: JSON.stringify(product.productData)
         .replace(/},{/g, " ")
         .replace(/[\[\]{"}]/g, ""),
     });

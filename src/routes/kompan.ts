@@ -16,23 +16,23 @@ router.addDefaultHandler(async ({ enqueueLinks }) => {
 
 router.addHandler("product", async ({ request, $, log, pushData }) => {
   try {
-    const title_element = $("h1").first();
-    const title = title_element?.text()?.trim() || "Title not found";
-    const product_id =
-      title_element?.prevAll("p").first().text().trim() ||
+    const titleElement = $("h1").first();
+    const title = titleElement?.text()?.trim() || "Title not found";
+    const productId =
+      titleElement?.prevAll("p").first().text().trim() ||
       "Product ID not found";
-    const img_src =
+    const imgSrc =
       $(`img[alt="${title}"]`).attr("src") || "Image source not found";
 
-    const product_data: ProductData[] = [];
+    const productData: ProductData[] = [];
 
-    const specifications_to_search = [
+    const specificationsToSearch = [
       "Detaljer om produktet",
       "Mål",
       "Garantier og certifikater",
       "Oplysninger om installation",
     ];
-    specifications_to_search.forEach((spec) => {
+    specificationsToSearch.forEach((spec) => {
       const container = $(`.sidepanel-content p:contains('${spec}')`)
         .closest(".el0d8xb0")
         .find(".e68owcd0")
@@ -47,28 +47,28 @@ router.addHandler("product", async ({ request, $, log, pushData }) => {
         const nameEl = $(element).find("p").first();
         const valueEl = $(element).find("p").last();
 
-        const data_name = nameEl?.text()?.trim() || "Data name not found";
-        const data_value = valueEl?.text()?.trim() || "Data value not found";
+        const dataName = nameEl?.text()?.trim() || "Data name not found";
+        const dataValue = valueEl?.text()?.trim() || "Data value not found";
 
-        product_data.push({ [data_name]: data_value });
+        productData.push({ [dataName]: dataValue });
       });
     });
 
     const current_product = {
       company: "Kompan",
-      title: `${title} - ${product_id}`,
+      title: `${title} - ${productId}`,
       url: request.loadedUrl,
-      img_src: img_src,
-      product_data,
+      imgSrc: imgSrc,
+      productData,
     };
 
     products.push(current_product);
     await pushData({
       company: "Kompan",
-      title: `${title} - ${product_id}`,
+      title: `${title} - ${productId}`,
       url: request.loadedUrl,
-      img_src: img_src,
-      product_data,
+      imgSrc: imgSrc,
+      productData,
     });
   } catch (error) {
     log.error(`Error processing product at ${request.loadedUrl}`, { error });

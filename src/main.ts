@@ -32,10 +32,10 @@ async function runCrawler(startUrl: string[], router: any) {
 await runCrawler(vinciStartUrl, vinciRouter);
 await runCrawler(kompanURL, kompanRouter);
 
-const all_products: Product[] = [...kompanProducts, ...vinciProducts];
+const allProducts: Product[] = [...kompanProducts, ...vinciProducts];
 
 exportToExcel(
-  all_products,
+  allProducts,
   "./storage/datasets/excel/" +
     new Date().toISOString().replace(/[^a-zA-Z0-9]/g, ""),
   "Combined Products"

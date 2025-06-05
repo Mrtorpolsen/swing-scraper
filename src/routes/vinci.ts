@@ -4,13 +4,13 @@ import { ProductData, Product } from "../interfaces/product.js";
 export const startUrl = ["https://www.vinci-play.com/en/playground-equipment"];
 export const router = createCheerioRouter();
 export const products: Product[] = [];
-const base_url = "https://www.vinci-play.com";
+const baseUrl = "https://www.vinci-play.com";
 
 router.addDefaultHandler(async ({ $, addRequests, log }) => {
   try {
     $(".cat-container li a").each((_, element) => {
       const $element = $(element);
-      const img_src =
+      const imgSrc =
         $element.find("img")?.attr("src") || "No image source found";
       const href = $element.attr("href");
       if (!href) {
@@ -18,19 +18,19 @@ router.addDefaultHandler(async ({ $, addRequests, log }) => {
         return;
       }
 
-      const url = base_url + href;
+      const url = baseUrl + href;
       addRequests([
         {
           url,
           label: "product",
           userData: {
-            img_src,
+            imgSrc,
           },
         },
       ]);
     });
   } catch (error) {
-    log.error(`Error in default handler at ${base_url}`, { error });
+    log.error(`Error in default handler at ${baseUrl}`, { error });
   }
 });
 
@@ -38,30 +38,30 @@ router.addHandler("product", async ({ request, $, log, pushData }) => {
   try {
     const title =
       $(".product-title").first().text().trim() || "Title not found";
-    const product_data: ProductData[] = [];
-    const product_table = $(".product-table");
+    const productData: ProductData[] = [];
+    const productTable = $(".product-table");
 
-    if (product_table.length === 0) {
+    if (productTable.length === 0) {
       log.warning(`No product table found for ${request.loadedUrl}`);
       return;
     }
 
-    product_table.find("tr").each((_, element) => {
+    productTable.find("tr").each((_, element) => {
       const nameEl = $(element).find("p").first();
       const valueEl = $(element).find("p").last();
 
-      const data_name = nameEl?.text()?.trim() || "Data name not found";
-      const data_value = valueEl?.text()?.trim() || "Data value not found";
+      const dataName = nameEl?.text()?.trim() || "Data name not found";
+      const dataValue = valueEl?.text()?.trim() || "Data value not found";
 
-      product_data.push({ [data_name]: data_value });
+      productData.push({ [dataName]: dataValue });
     });
 
     const current_product = {
       company: "Vinci Play",
       title,
       url: request.loadedUrl,
-      img_src: request.userData.img_src,
-      product_data,
+      imgSrc: request.userData.img_src,
+      productData,
     };
 
     products.push(current_product);

@@ -1,10 +1,10 @@
 export default function extractSubdomain(url: string): string {
-  try {
-    const hostname = new URL(url).hostname;
-    const match = hostname.match(/\.([^.]+)\./);
-    return match ? match[1] : `Error getting domain from ${hostname}`;
-  } catch (e) {
-    console.error("Invalid URL ", e);
-    return "Error geting domain";
+  const hostname = new URL(url).hostname;
+  const match = hostname.match(/\.([^.]+)\./);
+
+  if (!match) {
+    throw new Error(`Error getting domain from ${hostname}`);
   }
+
+  return match[1];
 }
