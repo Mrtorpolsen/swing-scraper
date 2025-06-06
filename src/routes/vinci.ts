@@ -60,7 +60,7 @@ router.addHandler("product", async ({ request, $, log, pushData }) => {
       company: "Vinci Play",
       title,
       url: request.loadedUrl,
-      imgSrc: request.userData.img_src,
+      imgSrc: request.userData.imgSrc,
       productData,
     };
 

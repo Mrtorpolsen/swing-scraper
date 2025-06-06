@@ -9,10 +9,16 @@ import {
   products as vinciProducts,
 } from "./routes/vinci.js";
 import {
-  startUrl as kompanURL,
+  startUrl as kompanUrl,
   router as kompanRouter,
   products as kompanProducts,
 } from "./routes/kompan.js";
+import {
+  startUrl as hagsUrl,
+  router as hagsRouter,
+  products as hagsProducts,
+} from "./routes/hags.js";
+
 async function runCrawler(startUrl: string[], router: any) {
   const requestQueue = await RequestQueue.open(`queue - ${startUrl[0]}`);
 
@@ -23,16 +29,20 @@ async function runCrawler(startUrl: string[], router: any) {
   const crawler = new CheerioCrawler({
     requestHandler: router,
     requestQueue,
-    maxRequestsPerCrawl: 20,
+    maxRequestsPerCrawl: 50,
   });
 
   await crawler.run();
 }
-
+await runCrawler(kompanUrl, kompanRouter);
 await runCrawler(vinciStartUrl, vinciRouter);
-await runCrawler(kompanURL, kompanRouter);
+await runCrawler(hagsUrl, hagsRouter);
 
-const allProducts: Product[] = [...kompanProducts, ...vinciProducts];
+const allProducts: Product[] = [
+  ...kompanProducts,
+  ...vinciProducts,
+  ...hagsProducts,
+];
 
 exportToExcel(
   allProducts,

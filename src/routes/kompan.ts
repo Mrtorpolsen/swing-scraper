@@ -64,11 +64,7 @@ router.addHandler("product", async ({ request, $, log, pushData }) => {
 
     products.push(current_product);
     await pushData({
-      company: "Kompan",
-      title: `${title} - ${productId}`,
-      url: request.loadedUrl,
-      imgSrc: imgSrc,
-      productData,
+      current_product,
     });
   } catch (error) {
     log.error(`Error processing product at ${request.loadedUrl}`, { error });
