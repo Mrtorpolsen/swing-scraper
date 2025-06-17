@@ -1,7 +1,7 @@
 import { UnknownDataName } from "../interfaces/dataName.js";
 
 export const unknownDataNames: UnknownDataName[] = [];
-
+//TODO ADD ENGLISH
 const synonyms: [string[], string][] = [
   [["Aldersgruppe", "Age group"], "AgeGroup"],
   [["Antal brugere", "Number of users"], "NumberOfUsers"],
@@ -52,43 +52,3 @@ function logUnkownDataName(
 
   return dataName;
 }
-
-/*   
-  ["Aldersgruppe", "Age group"],
-  ["Antal brugere", "Number of users"],
-  ["Brugergruppe"],
-  ["Inclusive"],
-  ["Produktkategori"],
-  ["Produktlinje"],
-  ["Produktnummer"],
-  ["Længde", "Length"],
-  ["Bredde", "Width"],
-  ["Højde", "Total height"],
-  ["Længde af sikkerhedszone", "Sikkerhedsområdets længde"],
-  ["Bredde af sikkerhedszone", "Sikkerhedsområdets bredde"],
-  ["Maks. faldhøjde", "Free fall height", "Faldhøjde"],
-  ["Faldunderlag", "Safety zone", "Sikkerhedsområde"],
-  ["Galvaniseret stål"],
-  ["Aluminium platforme"],
-  ["HPL sæde"],
-  ["Kugleleje konstruktion"],
-  ["Garanterede reservedele"],
-  ["Forankringsmuligheder"],
-  ["Samlingstid"],
-  ["Nettovægt"],
-  ["The height of the platforms"],
-  ["tube slide platform height"],
-  ["In accordance with norm EN"],
-  ["Availability of spare parts"]
-*/
-/*   
-  ["Aldersgruppe", "Age group"],
-  ["Antal brugere", "Number of users"],
-  ["Længde", "Length"],
-  ["Bredde", "Width"],
-  ["Højde", "Total height"],
-  ["Længde af sikkerhedszone", "Sikkerhedsområdets længde"],
-  ["Bredde af sikkerhedszone", "Sikkerhedsområdets bredde"],
-  ["Maks. faldhøjde", "Free fall height", "Faldhøjde"],
-  ["Faldunderlag", "Safety zone", "Sikkerhedsområde"],
-*/

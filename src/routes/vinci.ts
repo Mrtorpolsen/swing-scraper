@@ -1,5 +1,6 @@
 import { createCheerioRouter } from "crawlee";
 import { ProductData, Product } from "../interfaces/product.js";
+import productDataNormalizer from "../utils/productDataNormalizer.js";
 
 export const startUrl = ["https://www.vinci-play.com/en/playground-equipment"];
 export const router = createCheerioRouter();
@@ -50,7 +51,11 @@ router.addHandler("product", async ({ request, $, log, pushData }) => {
       const nameEl = $(element).find("p").first();
       const valueEl = $(element).find("p").last();
 
-      const dataName = nameEl?.text()?.trim() || "Data name not found";
+      const dataName = productDataNormalizer(
+        nameEl?.text()?.trim() || "Data name not found",
+        "Vinci Play",
+        request.loadedUrl
+      );
       const dataValue = valueEl?.text()?.trim() || "Data value not found";
 
       productData.push({ [dataName]: dataValue });

@@ -1,5 +1,6 @@
 import { createCheerioRouter } from "crawlee";
 import { ProductData, Product } from "../interfaces/product.js";
+import productDataNormalizer from "../utils/productDataNormalizer.js";
 
 export const startUrl = [
   "https://www.hags.com/da/products/playground-equipment",
@@ -55,7 +56,11 @@ router.addHandler("product", async ({ request, $, log, pushData }) => {
       const nameEl = $(element).find("td").first();
       const valueEl = $(element).find("td").last();
 
-      const dataName = nameEl?.text()?.trim() || "Data name not found";
+      const dataName = productDataNormalizer(
+        nameEl?.text()?.trim() || "Data name not found",
+        "Hags",
+        request.loadedUrl
+      );
       const dataValue = valueEl?.text()?.trim() || "Data value not found";
 
       productData.push({ [dataName]: dataValue });

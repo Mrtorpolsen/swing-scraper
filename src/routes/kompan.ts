@@ -61,7 +61,7 @@ router.addHandler("product", async ({ request, $, log, pushData }) => {
         );
         const dataValue = valueEl?.text()?.trim() || "Data value not found";
 
-        console.log(`${dataName} ${dataValue}`);
+        //console.log(`${dataName} ${dataValue}`);
 
         productData.push({ [dataName]: dataValue });
       });
