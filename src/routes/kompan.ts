@@ -44,8 +44,8 @@ router.addHandler("product", async ({ request, $, log, pushData }) => {
       }
 
       container.find(".ecz3vwj0").each((_, element) => {
-        const nameEl = $(element).find("p").first();
-        const valueEl = $(element).find("p").last();
+        const nameEl = $(element).find(".ecz3vwj1").children().first();
+        const valueEl = $(element).find(".ecz3vwj2").children().first();
 
         const dataName = nameEl?.text()?.trim() || "Data name not found";
         const dataValue = valueEl?.text()?.trim() || "Data value not found";
@@ -53,7 +53,6 @@ router.addHandler("product", async ({ request, $, log, pushData }) => {
         productData.push({ [dataName]: dataValue });
       });
     });
-
     const current_product = {
       company: "Kompan",
       title: `${title} - ${productId}`,
