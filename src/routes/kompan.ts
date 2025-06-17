@@ -45,15 +45,19 @@ router.addHandler("product", async ({ request, $, log, pushData }) => {
       }
 
       container.find(".ecz3vwj0").each((_, element) => {
-        const nameEl =
-          $(element).find(".ecz3vwj1").children("p").first() ||
-          $(element).find(".ecz3vwj1").children("span").first();
-        const valueEl =
-          $(element).find(".ecz3vwj2").children("p").first() ||
-          $(element).find(".ecz3vwj2").children("span").first();
+        const nameEl = $(element)
+          .find(".ecz3vwj1")
+          .children(":not(style):not(script)")
+          .first();
+        const valueEl = $(element)
+          .find(".ecz3vwj2")
+          .children(":not(style):not(script)")
+          .first();
 
         const dataName = productDataNormalizer(
-          nameEl?.text()?.trim() || "Data name not found"
+          nameEl?.text()?.trim() || "Data name not found",
+          "Kompan",
+          request.loadedUrl
         );
         const dataValue = valueEl?.text()?.trim() || "Data value not found";
 

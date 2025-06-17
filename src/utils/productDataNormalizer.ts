@@ -1,3 +1,7 @@
+import { UnknownDataName } from "../interfaces/dataName.js";
+
+export const unknownDataNames: UnknownDataName[] = [];
+
 const synonyms: [string[], string][] = [
   [["Aldersgruppe", "Age group"], "AgeGroup"],
   [["Antal brugere", "Number of users"], "NumberOfUsers"],
@@ -24,8 +28,29 @@ for (const [keys, normalizedValue] of synonyms) {
   }
 }
 
-export default function productDataNormalizer(dataName: string): string {
-  return lookupMap.get(dataName.toLowerCase()) || dataName;
+export default function productDataNormalizer(
+  dataName: string,
+  source: string,
+  url: string
+): string {
+  return (
+    lookupMap.get(dataName.toLowerCase()) ||
+    logUnkownDataName(dataName, source, url)
+  );
+}
+
+function logUnkownDataName(
+  dataName: string,
+  source: string,
+  url: string
+): string {
+  unknownDataNames.push({
+    dataName,
+    source,
+    url,
+  });
+
+  return dataName;
 }
 
 /*   

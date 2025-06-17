@@ -1,7 +1,12 @@
 // For more information, see https://crawlee.dev/
 import { CheerioCrawler, RequestQueue } from "crawlee";
-import { exportToExcel } from "./utils/exportToExcel.js";
+import {
+  exportProductsToExcel,
+  exportUnknownDataNameToExcel,
+} from "./utils/exportToExcel.js";
 import { Product } from "./interfaces/product.js";
+
+import { unknownDataNames } from "./utils/productDataNormalizer.js";
 
 import {
   startUrl as vinciStartUrl,
@@ -18,6 +23,8 @@ import {
   router as hagsRouter,
   products as hagsProducts,
 } from "./routes/hags.js";
+
+const fileName = new Date().toISOString().replace(/[^a-zA-Z0-9]/g, "");
 
 async function runCrawler(startUrl: string[], router: any) {
   const requestQueue = await RequestQueue.open(`queue - ${startUrl[0]}`);
@@ -49,9 +56,15 @@ const allProducts: Product[] = [
   ...hagsProducts,
 ];
 
-exportToExcel(
+exportProductsToExcel(
   allProducts,
-  "./storage/datasets/excel/" +
-    new Date().toISOString().replace(/[^a-zA-Z0-9]/g, ""),
+  "./storage/datasets/excel/" + fileName,
   "Combined Products"
+);
+exportUnknownDataNameToExcel(
+  unknownDataNames.filter(
+    (item, index, self) =>
+      index === self.findIndex((t) => t.dataName === item.dataName)
+  ),
+  "./storage/datasets/excel/" + fileName + "---UNKOWNS"
 );
