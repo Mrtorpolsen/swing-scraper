@@ -29,7 +29,12 @@ async function runCrawler(startUrl: string[], router: any) {
   const crawler = new CheerioCrawler({
     requestHandler: router,
     requestQueue,
-    maxRequestsPerCrawl: 50,
+    minConcurrency: 1,
+    maxConcurrency: 10,
+    autoscaledPoolOptions: {
+      desiredConcurrencyRatio: 0.3,
+    },
+    maxRequestsPerCrawl: 1000,
   });
 
   await crawler.run();
