@@ -17,6 +17,28 @@ router.addDefaultHandler(async ({ enqueueLinks }) => {
 
 router.addHandler("product", async ({ request, $, log, pushData }) => {
   try {
+    let current_product: Product = {
+      company: "",
+      title: "",
+      url: "",
+      imgSrc: "",
+      productNumber: "",
+      productLine: "",
+      productCategory: "",
+      ageGroup: "",
+      minAge: "",
+      numberOfUsers: "",
+      inclusive: "",
+      length: "",
+      width: "",
+      height: "",
+      lengthOfSecurityZone: "",
+      widthOfSecurityZone: "",
+      freeFallHeight: "",
+      safetyZoneM2: "",
+      productData: [],
+    };
+
     const titleElement = $("h1").first();
     const title = titleElement?.text()?.trim() || "Title not found";
     const productId =
@@ -44,33 +66,69 @@ router.addHandler("product", async ({ request, $, log, pushData }) => {
         return;
       }
 
+      const navElement = $("ol.e2d2et00");
+      //TODO LOOK INTO IT STILL CONTINUE IF I DOESNT FIND ELEMENT SEE https://docs.google.com/spreadsheets/d/1S__i_VOFjvemU1gNhecBMXHsHCOK9uA-GXOp_3kJnHc/edit?gid=2098298050#gid=2098298050
+      if (navElement.length === 0) {
+        log.warning(`No nav element found for ${request.loadedUrl}`);
+        return;
+      }
+
+      const navSections = navElement.find("li");
+
+      navElement.find("li").each((i, element) => {
+        if (i === 2) {
+          current_product.productCategory = $(element).find("a").first().text();
+        }
+        if (i === navSections.length - 2) {
+          current_product.productLine = $(element).find("a").first().text();
+        }
+      });
+
       container.find(".ecz3vwj0").each((_, element) => {
-        const nameEl = $(element)
+        const nameElement = $(element)
           .find(".ecz3vwj1")
           .children(":not(style):not(script)")
           .first();
-        const valueEl = $(element)
+        const valueElement = $(element)
           .find(".ecz3vwj2")
           .children(":not(style):not(script)")
           .first();
 
-        const dataName = productDataNormalizer(
-          nameEl?.text()?.trim() || "Data name not found",
+        const dataField = productDataNormalizer(
+          nameElement?.text()?.trim() || "Data name not found",
           "Kompan",
           request.loadedUrl
         );
-        const dataValue = valueEl?.text()?.trim() || "Data value not found";
+        const dataValue =
+          valueElement?.text()?.trim() || "Data value not found";
 
-        //console.log(`${dataName} ${dataValue}`);
+        if (dataField[1] === true) {
+          if (dataField[0] === "ageGroup") {
+            let minAge: number | string = dataValue;
+            minAge = dataValue[0];
+            if (isNaN(parseInt(dataValue[0], 10))) {
+              minAge = dataValue[1];
+            }
+            if (dataValue.includes("m")) {
+              const months = parseInt(dataValue.replace(/\D/g, ""), 10);
+              minAge = (months / 12).toString();
+            }
 
-        productData.push({ [dataName]: dataValue });
+            current_product = { ...current_product, minAge: minAge };
+          }
+          current_product = { ...current_product, [dataField[0]]: dataValue };
+        } else {
+          productData.push({ [dataField[0]]: dataValue });
+        }
       });
     });
-    const current_product = {
+    current_product = {
+      ...current_product,
       company: "Kompan",
-      title: `${title} - ${productId}`,
+      title,
       url: request.loadedUrl,
       imgSrc: imgSrc,
+      productNumber: productId,
       productData,
     };
 

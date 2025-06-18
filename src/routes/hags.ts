@@ -15,7 +15,7 @@ router.addDefaultHandler(async ({ enqueueLinks }) => {
       "https://www.hags.com/da/products/playground-equipment/play-systems/**",
       "https://www.hags.com/da/products/playground-equipment/freestanding/**",
       "https://www.hags.com/da/products/playground-equipment/themed/**",
-      "https://www.hags.com/da/products/new-products",
+      //"https://www.hags.com/da/products/new-products",
     ],
     label: "category",
   });
@@ -27,7 +27,7 @@ router.addHandler("category", async ({ enqueueLinks }) => {
       "https://www.hags.com/da/products/playground-equipment/play-systems/playcubes/**",
       "https://www.hags.com/da/products/playground-equipment/freestanding/play-sculptures/**",
       "https://www.hags.com/da/products/playground-equipment/themed/**/**",
-      "https://www.hags.com/da/products/new-products/**",
+      //"https://www.hags.com/da/products/new-products/**",
     ],
     label: "product",
     exclude: [/\?/],
@@ -36,6 +36,27 @@ router.addHandler("category", async ({ enqueueLinks }) => {
 
 router.addHandler("product", async ({ request, $, log, pushData }) => {
   try {
+    let current_product: Product = {
+      company: "",
+      title: "",
+      url: "",
+      imgSrc: "",
+      productNumber: "",
+      productLine: "",
+      productCategory: "",
+      ageGroup: "",
+      minAge: "",
+      numberOfUsers: "",
+      inclusive: "",
+      length: "",
+      width: "",
+      height: "",
+      lengthOfSecurityZone: "",
+      widthOfSecurityZone: "",
+      freeFallHeight: "",
+      safetyZoneM2: "",
+      productData: [],
+    };
     const titleElement = $("h1").first();
     const title = titleElement?.text()?.trim() || "Title not found";
     const productId =
@@ -52,25 +73,49 @@ router.addHandler("product", async ({ request, $, log, pushData }) => {
       return;
     }
 
-    productTable.find("tr").each((_, element) => {
-      const nameEl = $(element).find("td").first();
-      const valueEl = $(element).find("td").last();
+    const navElement = $("ul.product-nav");
 
-      const dataName = productDataNormalizer(
-        nameEl?.text()?.trim() || "Data name not found",
+    if (navElement.length === 0) {
+      log.warning(`No nav element found for ${request.loadedUrl}`);
+      return;
+    }
+
+    const navSections = navElement.find("li");
+
+    navElement.find("li").each((i, element) => {
+      if (i === 2) {
+        current_product.productCategory = $(element).find("a").first().text();
+      }
+      if (i === navSections.length - 2) {
+        current_product.productLine = $(element).find("a").first().text();
+      }
+    });
+
+    productTable.find("tr").each((_, element) => {
+      const nameElement = $(element).find("td").first();
+      const valueElement = $(element).find("td").first().next("td");
+
+      const dataField = productDataNormalizer(
+        nameElement?.text()?.trim() || "Data name not found",
         "Hags",
         request.loadedUrl
       );
-      const dataValue = valueEl?.text()?.trim() || "Data value not found";
+      const dataValue = valueElement?.text()?.trim() || "Data value not found";
 
-      productData.push({ [dataName]: dataValue });
+      if (dataField[1] === true) {
+        current_product = { ...current_product, [dataField[0]]: dataValue };
+      } else {
+        productData.push({ [dataField[0]]: dataValue });
+      }
     });
 
-    const current_product = {
+    current_product = {
+      ...current_product,
       company: "Hags",
-      title: `${title} - ${productId}`,
+      title,
       url: request.loadedUrl,
       imgSrc: baseUrl + "/" + imgSrc,
+      productNumber: productId,
       productData,
     };
 

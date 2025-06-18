@@ -37,6 +37,28 @@ router.addDefaultHandler(async ({ $, addRequests, log }) => {
 
 router.addHandler("product", async ({ request, $, log, pushData }) => {
   try {
+    let current_product: Product = {
+      company: "",
+      title: "",
+      url: "",
+      imgSrc: "",
+      productNumber: "",
+      productLine: "",
+      productCategory: "",
+      ageGroup: "",
+      minAge: "",
+      numberOfUsers: "",
+      inclusive: "",
+      length: "",
+      width: "",
+      height: "",
+      lengthOfSecurityZone: "",
+      widthOfSecurityZone: "",
+      freeFallHeight: "",
+      safetyZoneM2: "",
+      productData: [],
+    };
+
     const title =
       $(".product-title").first().text().trim() || "Title not found";
     const productData: ProductData[] = [];
@@ -48,29 +70,45 @@ router.addHandler("product", async ({ request, $, log, pushData }) => {
     }
 
     productTable.find("tr").each((_, element) => {
-      const nameEl = $(element).find("p").first();
-      const valueEl = $(element).find("p").last();
+      const nameElement = $(element).find("p").first();
+      const valueElement = $(element).find("p").last();
 
-      const dataName = productDataNormalizer(
-        nameEl?.text()?.trim() || "Data name not found",
+      const dataField = productDataNormalizer(
+        nameElement?.text()?.trim() || "Data name not found",
         "Vinci Play",
         request.loadedUrl
       );
-      const dataValue = valueEl?.text()?.trim() || "Data value not found";
+      const dataValue = valueElement?.text()?.trim() || "Data value not found";
 
-      productData.push({ [dataName]: dataValue });
+      if (dataField[1] === true) {
+        current_product = { ...current_product, [dataField[0]]: dataValue };
+      } else {
+        productData.push({ [dataField[0]]: dataValue });
+      }
     });
+    if (title !== "Title not found") {
+      const [name, id] = title.split(" ");
+      current_product = {
+        ...current_product,
+        productCategory: name,
+        productLine: id,
+      };
+    }
 
-    const current_product = {
+    current_product = {
+      ...current_product,
       company: "Vinci Play",
       title,
       url: request.loadedUrl,
       imgSrc: request.userData.imgSrc,
+      productNumber: title,
       productData,
     };
 
     products.push(current_product);
     await pushData(current_product);
+
+    console.log(`running - ${request.loadedUrl}`);
   } catch (error) {
     log.error(`Error processing product at ${request.loadedUrl}`, { error });
   }

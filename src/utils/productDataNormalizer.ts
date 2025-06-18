@@ -1,23 +1,41 @@
 import { UnknownDataName } from "../interfaces/dataName.js";
 
 export const unknownDataNames: UnknownDataName[] = [];
-//TODO ADD ENGLISH
+
 const synonyms: [string[], string][] = [
-  [["Aldersgruppe", "Age group"], "AgeGroup"],
-  [["Antal brugere", "Number of users"], "NumberOfUsers"],
-  [["Længde"], "Length"],
-  [["Bredde"], "Width"],
-  [["Højde"], "TotalHeight"],
+  [["Produktnummer"], "productNumber"],
+  [["Produktlinje"], "productLine"],
+  [["Produktkategori"], "productCategory"],
+  [["Aldersgruppe", "Age Range", "Age group"], "ageGroup"],
+  [["Antal brugere", "Number of users"], "numberOfUsers"],
+  [["Inclusive"], "inclusive"],
+  [["Længde", "Length"], "length"],
+  [["Bredde", "Width"], "width"],
+  [["Højde", "Height", "Total height"], "height"],
   [
-    ["Længde af sikkerhedszone", "Sikkerhedsområdets længde"],
-    "SafetyZoneLength",
+    [
+      "Længde af sikkerhedszone",
+      "Safety Area Length",
+      "Sikkerhedsområdets længde",
+    ],
+    "lengthOfSecurityZone",
   ],
   [
-    ["Bredde af sikkerhedszone", "Sikkerhedsområdets bredde"],
-    "SafetyZoneWidth",
+    [
+      "Bredde af sikkerhedszone",
+      "Safety Area Width",
+      "Sikkerhedsområdets bredde",
+    ],
+    "widthOfSecurityZone",
   ],
-  [["Maks. faldhøjde", "Free fall height", "Faldhøjde"], "FreeFallHeight"],
-  [["Faldunderlag", "Safety zone", "Sikkerhedsområde"], "SafetyZone"],
+  [
+    ["Maks. Faldhøjde", "Fall Height", "Free fall height", "Faldhøjde"],
+    "freeFallHeight",
+  ],
+  [
+    ["Faldunderlag", "Safety Area", "Safety zone", "Sikkerhedsområde"],
+    "safetyZoneM2",
+  ],
 ];
 
 const lookupMap = new Map<string, string>();
@@ -32,11 +50,14 @@ export default function productDataNormalizer(
   dataName: string,
   source: string,
   url: string
-): string {
-  return (
-    lookupMap.get(dataName.toLowerCase()) ||
-    logUnkownDataName(dataName, source, url)
-  );
+): [string, boolean] {
+  const normalized = lookupMap.get(dataName.toLowerCase());
+  if (normalized) {
+    return [normalized, true];
+  } else {
+    const logged = logUnkownDataName(dataName, source, url);
+    return [logged, false];
+  }
 }
 
 function logUnkownDataName(
