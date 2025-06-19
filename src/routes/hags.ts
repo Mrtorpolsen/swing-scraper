@@ -1,7 +1,7 @@
 import { createCheerioRouter } from "crawlee";
 import { ProductData, Product } from "../interfaces/product.js";
 import productDataNormalizer from "../utils/productDataNormalizer.js";
-
+//TODO Kig på hvad den scraper og hvor den starter.
 export const startUrl = [
   "https://www.hags.com/da/products/playground-equipment",
 ];
@@ -15,8 +15,9 @@ router.addDefaultHandler(async ({ enqueueLinks }) => {
       "https://www.hags.com/da/products/playground-equipment/play-systems/**",
       "https://www.hags.com/da/products/playground-equipment/freestanding/**",
       "https://www.hags.com/da/products/playground-equipment/themed/**",
-      //"https://www.hags.com/da/products/new-products",
+      "https://www.hags.com/da/products/new-products",
     ],
+    exclude: [/\?/],
     label: "category",
   });
 });
@@ -27,15 +28,16 @@ router.addHandler("category", async ({ enqueueLinks }) => {
       "https://www.hags.com/da/products/playground-equipment/play-systems/playcubes/**",
       "https://www.hags.com/da/products/playground-equipment/freestanding/play-sculptures/**",
       "https://www.hags.com/da/products/playground-equipment/themed/**/**",
-      //"https://www.hags.com/da/products/new-products/**",
+      "https://www.hags.com/da/products/new-products/**",
     ],
     label: "product",
-    exclude: [/\?/],
+    //exclude: [/\?/],
   });
 });
 
 router.addHandler("product", async ({ request, $, log, pushData }) => {
   try {
+    log.info(`Scraping: ${request.url}`);
     let current_product: Product = {
       company: "",
       title: "",
@@ -77,19 +79,20 @@ router.addHandler("product", async ({ request, $, log, pushData }) => {
 
     if (navElement.length === 0) {
       log.warning(`No nav element found for ${request.loadedUrl}`);
-      return;
+    } else {
+      const navSections = navElement.find("li");
+
+      navElement.find("li").each((i, element) => {
+        if (i === 2) {
+          current_product.productCategory =
+            $(element).find("a").first().text() || "Product category not found";
+        }
+        if (i === navSections.length - 2) {
+          current_product.productLine =
+            $(element).find("a").first().text() || "Product line not found";
+        }
+      });
     }
-
-    const navSections = navElement.find("li");
-
-    navElement.find("li").each((i, element) => {
-      if (i === 2) {
-        current_product.productCategory = $(element).find("a").first().text();
-      }
-      if (i === navSections.length - 2) {
-        current_product.productLine = $(element).find("a").first().text();
-      }
-    });
 
     productTable.find("tr").each((_, element) => {
       const nameElement = $(element).find("td").first();
@@ -103,6 +106,18 @@ router.addHandler("product", async ({ request, $, log, pushData }) => {
       const dataValue = valueElement?.text()?.trim() || "Data value not found";
 
       if (dataField[1] === true) {
+        if (dataField[0] === "ageGroup") {
+          const minAge =
+            dataValue.split(/[-\/]/)[0].trim() || "Min age not found";
+          /*           let minAge: number | string = dataValue;
+          if (dataValue.includes("+")) {
+            minAge = dataValue.replace(/\D/g, "") || "Min age not found";
+          } else {
+            minAge = dataValue.split("-")[0].trim() || "Min age not found";
+          } */
+
+          current_product = { ...current_product, minAge: minAge };
+        }
         current_product = { ...current_product, [dataField[0]]: dataValue };
       } else {
         productData.push({ [dataField[0]]: dataValue });
@@ -120,10 +135,8 @@ router.addHandler("product", async ({ request, $, log, pushData }) => {
     };
 
     products.push(current_product);
-
-    await pushData({
-      current_product,
-    });
+    console.log(request.loadedUrl);
+    await pushData(current_product);
   } catch (error) {
     log.error(`Error processing product at ${request.loadedUrl}`, { error });
   }

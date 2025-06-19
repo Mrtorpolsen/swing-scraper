@@ -37,6 +37,7 @@ router.addDefaultHandler(async ({ $, addRequests, log }) => {
 
 router.addHandler("product", async ({ request, $, log, pushData }) => {
   try {
+    log.info(`Scraping: ${request.url}`);
     let current_product: Product = {
       company: "",
       title: "",
@@ -81,6 +82,14 @@ router.addHandler("product", async ({ request, $, log, pushData }) => {
       const dataValue = valueElement?.text()?.trim() || "Data value not found";
 
       if (dataField[1] === true) {
+        if (dataField[0] === "ageGroup") {
+          let minAge =
+            dataValue.split(/[-\/]/)[0].trim() || "Min age not found";
+          if (dataValue.includes("+")) {
+            minAge = dataValue.replace(/\D/g, "") || "Min age not found";
+          }
+          current_product = { ...current_product, minAge: minAge };
+        }
         current_product = { ...current_product, [dataField[0]]: dataValue };
       } else {
         productData.push({ [dataField[0]]: dataValue });
@@ -107,8 +116,6 @@ router.addHandler("product", async ({ request, $, log, pushData }) => {
 
     products.push(current_product);
     await pushData(current_product);
-
-    console.log(`running - ${request.loadedUrl}`);
   } catch (error) {
     log.error(`Error processing product at ${request.loadedUrl}`, { error });
   }

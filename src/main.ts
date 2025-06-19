@@ -46,9 +46,9 @@ async function runCrawler(startUrl: string[], router: any) {
 
   await crawler.run();
 }
-await runCrawler(kompanUrl, kompanRouter);
-/* await runCrawler(vinciStartUrl, vinciRouter); */
+/* await runCrawler(kompanUrl, kompanRouter); */
 /* await runCrawler(hagsUrl, hagsRouter); */
+await runCrawler(vinciStartUrl, vinciRouter);
 
 const allProducts: Product[] = [
   ...kompanProducts,

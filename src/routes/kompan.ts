@@ -17,6 +17,7 @@ router.addDefaultHandler(async ({ enqueueLinks }) => {
 
 router.addHandler("product", async ({ request, $, log, pushData }) => {
   try {
+    log.info(`Scraping: ${request.url}`);
     let current_product: Product = {
       company: "",
       title: "",
@@ -55,6 +56,25 @@ router.addHandler("product", async ({ request, $, log, pushData }) => {
       "Garantier og certifikater",
       "Oplysninger om installation",
     ];
+
+    const navElement = $("ol.e2d2et00");
+    if (navElement.length === 0) {
+      log.warning(`No nav element found for ${request.loadedUrl}`);
+    } else {
+      const navSections = navElement.find("li");
+
+      navElement.find("li").each((i, element) => {
+        if (i === 2) {
+          current_product.productCategory =
+            $(element).find("a").first().text() || "Product category not found";
+        }
+        if (i === navSections.length - 2) {
+          current_product.productLine =
+            $(element).find("a").first().text() || "Product line not found";
+        }
+      });
+    }
+
     specificationsToSearch.forEach((spec) => {
       const container = $(`.sidepanel-content p:contains('${spec}')`)
         .closest(".el0d8xb0")
@@ -65,24 +85,6 @@ router.addHandler("product", async ({ request, $, log, pushData }) => {
         log.warning(`Section "${spec}" not found for ${title}`);
         return;
       }
-
-      const navElement = $("ol.e2d2et00");
-      //TODO LOOK INTO IT STILL CONTINUE IF I DOESNT FIND ELEMENT SEE https://docs.google.com/spreadsheets/d/1S__i_VOFjvemU1gNhecBMXHsHCOK9uA-GXOp_3kJnHc/edit?gid=2098298050#gid=2098298050
-      if (navElement.length === 0) {
-        log.warning(`No nav element found for ${request.loadedUrl}`);
-        return;
-      }
-
-      const navSections = navElement.find("li");
-
-      navElement.find("li").each((i, element) => {
-        if (i === 2) {
-          current_product.productCategory = $(element).find("a").first().text();
-        }
-        if (i === navSections.length - 2) {
-          current_product.productLine = $(element).find("a").first().text();
-        }
-      });
 
       container.find(".ecz3vwj0").each((_, element) => {
         const nameElement = $(element)
@@ -105,13 +107,10 @@ router.addHandler("product", async ({ request, $, log, pushData }) => {
         if (dataField[1] === true) {
           if (dataField[0] === "ageGroup") {
             let minAge: number | string = dataValue;
-            minAge = dataValue[0];
-            if (isNaN(parseInt(dataValue[0], 10))) {
-              minAge = dataValue[1];
-            }
+            minAge = dataValue.replace(/\D/g, "") || "Min age not found";
             if (dataValue.includes("m")) {
               const months = parseInt(dataValue.replace(/\D/g, ""), 10);
-              minAge = (months / 12).toString();
+              minAge = (months / 12).toString() || "Min age not found";
             }
 
             current_product = { ...current_product, minAge: minAge };
@@ -133,9 +132,7 @@ router.addHandler("product", async ({ request, $, log, pushData }) => {
     };
 
     products.push(current_product);
-    await pushData({
-      current_product,
-    });
+    await pushData(current_product);
   } catch (error) {
     log.error(`Error processing product at ${request.loadedUrl}`, { error });
   }
