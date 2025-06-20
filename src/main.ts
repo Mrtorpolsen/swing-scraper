@@ -38,17 +38,23 @@ async function runCrawler(startUrl: string[], router: any) {
     requestQueue,
     minConcurrency: 1,
     maxConcurrency: 10,
+    failedRequestHandler: async ({ request, log }) => {
+      log.warning(`Failed to crawl: ${request.url}`);
+      log.warning(`Reason: ${request.errorMessages?.join("; ")}`);
+
+      // TODO HANDLE DEAD LINKS, maybe push to DB
+    },
     autoscaledPoolOptions: {
       desiredConcurrencyRatio: 0.3,
     },
-    maxRequestsPerCrawl: 50,
+    maxRequestsPerCrawl: 30,
   });
 
   await crawler.run();
 }
-/* await runCrawler(kompanUrl, kompanRouter); */
-await runCrawler(hagsUrl, hagsRouter);
-/* await runCrawler(vinciStartUrl, vinciRouter); */
+/* await runCrawler(kompanUrl, kompanRouter);
+await runCrawler(hagsUrl, hagsRouter); */
+await runCrawler(vinciStartUrl, vinciRouter);
 
 const allProducts: Product[] = [
   ...kompanProducts,

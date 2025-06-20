@@ -1,4 +1,4 @@
-import { createCheerioRouter } from "crawlee";
+import { createCheerioRouter, RequestOptions, Dictionary } from "crawlee";
 import { ProductData, Product } from "../interfaces/product.js";
 import productDataNormalizer from "../utils/productDataNormalizer.js";
 
@@ -10,22 +10,70 @@ const baseUrl = "https://www.hags.com";
 router.addDefaultHandler(async ({ enqueueLinks }) => {
   await enqueueLinks({
     globs: [
-      "https://www.hags.com/da/products/*/",
       "https://www.hags.com/da/products/*",
+      "https://www.hags.com/da/products/*/",
     ],
     exclude: [/\?/],
     label: "category",
   });
 });
+//Gentænk det -- Du har de store kategorier, og så subkategorierne, hvor du bare kan manuelt loope igenne dem i tabellen.
+//Sig til den at den kun må gå 1 frem, indtil den rammer en tabel.
+router.addHandler(
+  "category",
+  async ({ $, enqueueLinks, addRequests, log, request }) => {
+    try {
+      console.log(`Processing ${request.loadedUrl}`);
+      const product_container = $(
+        "section.products-listing div.products-listing__grid"
+      );
+      const nextPage = $("a#nextpage").attr("href");
+      console.log("nextPage " + nextPage);
+      if (nextPage) {
+        const url = baseUrl + nextPage;
+        console.log(` NEXTPAGE URL IS RUNNING ${url}`);
+        await addRequests([
+          {
+            url,
+            label: "category",
+          },
+        ]);
+      }
 
-router.addHandler("category", async ({ enqueueLinks, request }) => {
-  const base = request.loadedUrl.replace(/\/$/, "");
-  await enqueueLinks({
-    globs: [`${base}/**`],
-    label: "product",
-    exclude: [/\?/],
-  });
-});
+      if (product_container.length === 0) {
+        const base = request.loadedUrl.replace(/\/$/, "");
+        await enqueueLinks({
+          globs: [`${base}/*`],
+          exclude: [/\?/],
+          label: "category",
+        });
+        return;
+      }
+
+      console.log(`IT WAS A PRODUCT PAGE ${request.loadedUrl}`);
+
+      product_container.find("div.product-card").each((_, element) => {
+        const $element = $(element);
+        const href = $element.find("a").first().attr("href");
+        if (!href) {
+          log.warning("no href found - skipping..." + element);
+          return;
+        }
+
+        const url = new URL(href, baseUrl).toString();
+        addRequests([
+          {
+            url,
+            label: "product",
+            uniqueKey: url,
+          },
+        ]);
+      });
+    } catch (error) {
+      log.error(`Error in default handler at ${baseUrl}`, { error });
+    }
+  }
+);
 
 router.addHandler("product", async ({ request, $, log, pushData }) => {
   try {

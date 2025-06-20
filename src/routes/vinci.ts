@@ -19,7 +19,7 @@ router.addDefaultHandler(async ({ $, addRequests, log }) => {
         return;
       }
 
-      const url = baseUrl + href;
+      const url = new URL(href, baseUrl).toString();
       addRequests([
         {
           url,
