@@ -1,4 +1,4 @@
-import { createCheerioRouter, RequestOptions, Dictionary } from "crawlee";
+import { createCheerioRouter } from "crawlee";
 import { ProductData, Product } from "../interfaces/product.js";
 import productDataNormalizer from "../utils/productDataNormalizer.js";
 
@@ -17,8 +17,6 @@ router.addDefaultHandler(async ({ enqueueLinks }) => {
     label: "category",
   });
 });
-//Gentænk det -- Du har de store kategorier, og så subkategorierne, hvor du bare kan manuelt loope igenne dem i tabellen.
-//Sig til den at den kun må gå 1 frem, indtil den rammer en tabel.
 router.addHandler(
   "category",
   async ({ $, enqueueLinks, addRequests, log, request }) => {
@@ -31,7 +29,6 @@ router.addHandler(
       console.log("nextPage " + nextPage);
       if (nextPage) {
         const url = baseUrl + nextPage;
-        console.log(` NEXTPAGE URL IS RUNNING ${url}`);
         await addRequests([
           {
             url,
@@ -49,8 +46,6 @@ router.addHandler(
         });
         return;
       }
-
-      console.log(`IT WAS A PRODUCT PAGE ${request.loadedUrl}`);
 
       product_container.find("div.product-card").each((_, element) => {
         const $element = $(element);

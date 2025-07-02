@@ -47,13 +47,13 @@ async function runCrawler(startUrl: string[], router: any) {
     autoscaledPoolOptions: {
       desiredConcurrencyRatio: 0.3,
     },
-    maxRequestsPerCrawl: 30,
+    maxRequestsPerCrawl: 1000,
   });
 
   await crawler.run();
 }
-/* await runCrawler(kompanUrl, kompanRouter);
-await runCrawler(hagsUrl, hagsRouter); */
+await runCrawler(kompanUrl, kompanRouter);
+await runCrawler(hagsUrl, hagsRouter);
 await runCrawler(vinciStartUrl, vinciRouter);
 
 const allProducts: Product[] = [
