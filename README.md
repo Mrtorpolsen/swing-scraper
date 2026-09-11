@@ -1,6 +1,6 @@
 # Swing Scraper
 
-A web scraper for collecting and structuring playground equipment data.
+A web scraper for collecting and structuring playground equipment data from three different site.
 
 ## About
 
